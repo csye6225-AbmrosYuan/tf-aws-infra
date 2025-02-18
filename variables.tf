@@ -64,6 +64,15 @@ variable "profile" {
   default     = "dev-user1-PowerUserAccess"
 }
 
+variable "private_rt_name" {
+  type    = string
+  default = "vpc-private-rt"
+}
+
+variable "public_rt_name" {
+  type    = string
+  default = "vpc-public-rt"
+}
 
 # variable "region_number" {
 #   # Arbitrary mapping of region name to number to use in

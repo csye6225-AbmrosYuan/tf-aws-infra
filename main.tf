@@ -70,7 +70,7 @@ resource "aws_route_table" "public" {
   vpc_id = aws_vpc.this.id
 
   tags = {
-    Name = "${var.vpc_name}-public-rt"
+    Name = var.public_rt_name
   }
 }
 
@@ -92,7 +92,7 @@ resource "aws_route_table" "private" {
   vpc_id = aws_vpc.this.id
 
   tags = {
-    Name = "${var.vpc_name}-private-rt"
+    Name = var.private_rt_name
   }
 }
 
