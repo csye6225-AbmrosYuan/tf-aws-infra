@@ -4,7 +4,7 @@ terraform {
       source = "hashicorp/aws"
     }
   }
-
+}
 
 # test git work flow
 
