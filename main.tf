@@ -6,6 +6,7 @@ terraform {
   }
 }
 
+# test git work flow
 
 # Configure the AWS Provider
 provider "aws" {
