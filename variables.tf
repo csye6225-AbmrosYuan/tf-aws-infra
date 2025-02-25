@@ -1,13 +1,13 @@
 variable "aws_region" {
   description = "AWS Region to deploy resources."
   type        = string
-  default     = "us-east-1"
+  default     = "eu-west-2"
 }
 
 variable "vpc_cidr" {
   description = "CIDR block for the VPC."
   type        = string
-  default     = "10.0.0.0/16"
+  default     = "192.168.0.0/16"
 }
 
 variable "vpc_name" {
@@ -61,7 +61,8 @@ variable "destination_cidr" {
 variable "profile" {
   description = "AWS CLI profile to use."
   type        = string
-  default     = "dev-user1-PowerUserAccess"
+  # default     = "dev-user1-PowerUserAccess"
+  default     = "demo-sso-profile"
 }
 
 variable "private_rt_name" {
