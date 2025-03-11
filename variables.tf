@@ -1,7 +1,7 @@
 variable "aws_region" {
   description = "AWS Region to deploy resources."
   type        = string
-  default     = "eu-west-2"
+  default     = "us-east-1"
 }
 
 variable "vpc_cidr" {
@@ -62,7 +62,7 @@ variable "profile" {
   description = "AWS CLI profile to use."
   type        = string
   # default     = "dev-user1-PowerUserAccess"
-  default     = "demo-sso-profile"
+  default     = "dev"
 }
 
 variable "private_rt_name" {
@@ -74,95 +74,3 @@ variable "public_rt_name" {
   type    = string
   default = "vpc-public-rt"
 }
-
-# variable "region_number" {
-#   # Arbitrary mapping of region name to number to use in
-#   # a VPC's CIDR prefix.
-#   default = {
-#     us-east-1      = 1
-#     us-west-1      = 2
-#     us-west-2      = 3
-#     eu-central-1   = 4
-#     ap-northeast-1 = 5
-#   }
-# }
-
-# variable "az_number" {
-#   # Assign a number to each AZ letter used in our configuration
-#   default = {
-#     a = 1
-#     b = 2
-#     c = 3
-#     d = 4
-#     e = 5
-#     f = 6
-#   }
-# }
-
-# # Retrieve the AZ where we want to create network resources
-# # This must be in the region selected on the AWS provider.
-# data "aws_availability_zone" "this" {
-#   name = "us-east-1a"
-# }
-
-
-
-
-
-
-# variable "aws_region" {
-#   description = "AWS Region to deploy resources."
-#   type        = string
-#   default     = "us-east-2"
-# }
-
-# variable "profile" {
-#   description = "AWS CLI profile to use."
-#   type        = string
-#   default     = "dev-user1-PowerUserAccess"
-# }
-
-# variable "vpcs" {
-#   description = "Map of VPC configurations keyed by unique identifier."
-#   type = map(object({
-#     vpc_cidr               = string
-#     vpc_name               = string
-#     subnet_bits            = number
-#     public_subnets_number  = number
-#     private_subnets_number = number
-#     private_subnet_offset  = number
-#   }))
-
-#   default = {
-#     vpc1 = {
-#       vpc_cidr               = "10.0.0.0/16"
-#       vpc_name               = "vpc-prod"
-#       subnet_bits            = 8
-#       public_subnets_number  = 3
-#       private_subnets_number = 3
-#       private_subnet_offset  = 32
-#     },
-#     vpc2 = {
-#       vpc_cidr               = "10.1.0.0/16"
-#       vpc_name               = "vpc-dev"
-#       subnet_bits            = 8
-#       public_subnets_number  = 3
-#       private_subnets_number = 3
-#       private_subnet_offset  = 32
-#     },
-#     # vpc3 = {
-#     #   vpc_cidr               = "10.2.0.0/16"
-#     #   vpc_name               = "vpc-xx"
-#     #   subnet_bits            = 8
-#     #   public_subnets_number  = 3
-#     #   private_subnets_number = 3
-#     #   private_subnet_offset  = 32
-#     # },
-#   }
-# }
-
-# variable "destination_cidr" {
-#   description = "Destination CIDR for public route."
-#   type        = string
-#   default     = "0.0.0.0/0"
-# }
