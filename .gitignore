@@ -168,7 +168,10 @@ cython_debug/
 #.idea/
 
 # PyPI configuration file
-.pypirc
-.DS_Store
-.terraform*
+*.pypirc
+*.DS_Store
+*.terraform*
 terraform.*
+*.pem
+*.env
+*.tpl

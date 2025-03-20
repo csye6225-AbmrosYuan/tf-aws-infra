@@ -19,13 +19,13 @@ resource "aws_security_group" "webapp_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-#   #  HTTPS (Port 443)
-#   ingress {
-#     from_port   = 443
-#     to_port     = 443
-#     protocol    = "tcp"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
+  #  HTTPS (Port 443)
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   ingress {
     from_port   = 8080
@@ -46,3 +46,20 @@ resource "aws_security_group" "webapp_sg" {
     Name = "webapp-sg"
   }
 }
+
+
+resource "aws_security_group" "db_sg" {
+  name = "rdb_security_group"
+  description = "Security group for RDS instances"
+  vpc_id      = aws_vpc.this.id
+
+   ingress {
+    from_port       = 3306  
+    to_port         = 3306  
+    protocol        = "tcp"
+    security_groups = [aws_security_group.webapp_sg.id]
+    description     = "Allow database access from application security group"
+  }
+}
+
+
