@@ -1,5 +1,5 @@
 #!/bin/bash
-# sudo systemctl enable webappFlask
-
-# sudo sleep 5 && echo$(systemctl status webappFlask)
+sudo systemctl enable webappFlask
+sudo systemctl start webappFlask.service
+sudo apt install mysql-client -y
 

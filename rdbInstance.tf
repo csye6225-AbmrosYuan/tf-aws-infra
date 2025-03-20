@@ -66,7 +66,14 @@ variable "tags" {
   }
 }
 
+resource "aws_db_subnet_group" "rds_subnet_group" {
+  name       = "rds-subnet-group"
+  subnet_ids = aws_subnet.private[*].id
 
+  tags = {
+    Name = "RDS Subnet Group"
+  }
+}
 
 resource "aws_db_instance" "rds_instance" {
   identifier             = var.db_identifier
@@ -79,7 +86,7 @@ resource "aws_db_instance" "rds_instance" {
   multi_az               = var.multi_az
   skip_final_snapshot    = var.skip_final_snapshot
 
-  db_subnet_group_name   = aws_subnet.private[0].id
+  db_subnet_group_name   = aws_db_subnet_group.rds_subnet_group.name
   vpc_security_group_ids = [aws_security_group.db_sg.id]
   parameter_group_name   = aws_db_parameter_group.mysql_pg.name
   
@@ -90,8 +97,9 @@ resource "aws_db_instance" "rds_instance" {
   tags = var.tags
 }
 
+
 output "rds_endpoint" {
-  value = aws_db_instance.rds_instance.endpoint
+  value = split(":",  aws_db_instance.rds_instance.endpoint)[0]
 }
 
 

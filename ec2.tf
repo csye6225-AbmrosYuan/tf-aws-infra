@@ -78,7 +78,7 @@ resource "aws_instance" "webapp_instance" {
     connection {
       type        = "ssh"
       user        = var.ec2_ssh_user
-      private_key = var.ec2_ssh_key
+      private_key = file(var.ec2_ssh_key)
       host        = self.public_ip
     }
   }
