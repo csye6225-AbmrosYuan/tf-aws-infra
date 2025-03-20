@@ -38,7 +38,7 @@ variable "webapp_env" {
 }
 variable "destination_dir" {
   type = string
-  default = "/opt/csye6225/webappFlask/app"
+  default = "/tmp/webapp.env"
 }
 
 variable "ec2_ssh_user" {
@@ -46,15 +46,15 @@ variable "ec2_ssh_user" {
   default = "ubuntu"
 }
 
-variable "ec2_ssh_key" {
-  description = "Path to the SSH private key file"
-  type        = string
-  default     = null
-}
+# variable "ec2_ssh_key" {
+#   description = "Path to the SSH private key file"
+#   type        = string
+#   default     = null
+# }
 
-locals {
-  ssh_key_path = var.ec2_ssh_key != null ? var.ec2_ssh_key : "${path.module}/csye6225.pem"
-}
+# locals {
+#   ssh_key_path = var.ec2_ssh_key != null ? var.ec2_ssh_key : "${path.module}/csye6225.pem"
+# }
 
 
 resource "aws_instance" "webapp_instance" {
@@ -78,7 +78,7 @@ resource "aws_instance" "webapp_instance" {
     connection {
       type        = "ssh"
       user        = var.ec2_ssh_user
-      private_key = file(var.ec2_ssh_key)
+      private_key = file("${path.module}/csye6225.pem")
       host        = self.public_ip
     }
   }
