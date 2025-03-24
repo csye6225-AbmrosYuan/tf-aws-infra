@@ -86,10 +86,62 @@ resource "aws_instance" "webapp_instance" {
   root_block_device {
     volume_size = var.aws_volume_size  
     volume_type = var.aws_volume_type
-    delete_on_termination = true  # 终止实例时删除卷
+    delete_on_termination = true 
   }
 
   tags = {
     Name = "webapp-instance"
   }
 }
+
+
+# EC2 IAM policy
+resource "aws_iam_policy" "webapp_policy" {
+  name        = "webapp_policy"
+  description = "Policy for webapp user with S3 and EC2 permissions"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "ObjectOperations",
+        Effect = "Allow",
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ],
+        Resource = "${aws_s3_bucket.webappbucket.arn}/*"
+      },
+      {
+        Sid    = "Statement1",
+        Effect = "Allow",
+        Action = [
+          "ec2:AssociateRouteTable",
+          "ec2:AuthorizeSecurityGroupEgress",
+          "ec2:CreateRouteTable",
+          "ec2:CreateSecurityGroup",
+          "ec2:CreateSubnet",
+          "ec2:DescribeInstances",
+          "ec2:DescribeNetworkInterfaces",
+          "ec2:DescribeRouteTables",
+          "ec2:DescribeSecurityGroups",
+          "ec2:DescribeSubnets",
+          "ec2:ModifyNetworkInterfaceAttribute",
+          "ec2:RevokeSecurityGroupEgress"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+# Attach policy to webapp
+resource "aws_iam_user_policy_attachment" "webapp_policy_attachment" {
+  user       = "webapp"
+  policy_arn = aws_iam_policy.webapp_policy.arn
+}
+
+
+ output "webapp_env_path" {
+    value = abspath(var.webapp_env)
+  }
