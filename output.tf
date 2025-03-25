@@ -7,5 +7,5 @@ resource "local_file" "webapp_env" {
     s3_bucket_name = "bucket${random_id.s3_bucket_id.hex}"
     s3_region_name = var.aws_region
   })
-  filename = "${path.module}/webapp.env"
+  filename = "webapp.env"
 }

@@ -32,10 +32,10 @@ variable "ec2_user_data" {
   default = "ec2SetUp.sh"
 }
 
-variable "webapp_env" {
-  type = string
-  default = "webapp.env"
-}
+# variable "webapp_env" {
+#   type = string
+#   default = "webapp.env"
+# }
 variable "destination_dir" {
   type = string
   default = "/tmp/webapp.env"
@@ -72,8 +72,22 @@ resource "aws_instance" "webapp_instance" {
 
   #  将本地的 setup.sh 文件传输到实例的 /opt/ 目录
   provisioner "file" {
-    source      = var.webapp_env
+    source      = local_file.webapp_env.filename
     destination = var.destination_dir
+
+    connection {
+      type        = "ssh"
+      user        = var.ec2_ssh_user
+      private_key = file("${path.module}/csye6225.pem")
+      host        = self.public_ip
+    }
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo mv -f /tmp/webapp.env /opt/csye6225/webappFlask/app/",
+      "sudo chown csye6225_user:csye6225 /opt/csye6225/webappFlask/app/webapp.env"
+    ]
 
     connection {
       type        = "ssh"
@@ -140,8 +154,3 @@ resource "aws_iam_user_policy_attachment" "webapp_policy_attachment" {
   user       = "webapp"
   policy_arn = aws_iam_policy.webapp_policy.arn
 }
-
-
- output "webapp_env_path" {
-    value = abspath(var.webapp_env)
-  }
