@@ -46,3 +46,20 @@ resource "aws_security_group" "webapp_sg" {
     Name = "webapp-sg"
   }
 }
+
+
+resource "aws_security_group" "db_sg" {
+  name = "rdb_security_group"
+  description = "Security group for RDS instances"
+  vpc_id      = aws_vpc.this.id
+
+   ingress {
+    from_port       = 3306  
+    to_port         = 3306  
+    protocol        = "tcp"
+    security_groups = [aws_security_group.webapp_sg.id]
+    description     = "Allow database access from application security group"
+  }
+}
+
+
