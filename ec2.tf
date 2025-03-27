@@ -1,7 +1,7 @@
 variable "aws_ami_id" {
   description = "ami id"
   type        = string
-  default     = "ami-038162d1d15a62337"
+  default     = "ami-0b80818d00653ac66"
 }
 
 
@@ -32,35 +32,41 @@ variable "ec2_user_data" {
   default = "ec2SetUp.sh"
 }
 
-# variable "webapp_env" {
-#   type = string
-#   default = "webapp.env"
-# }
-variable "destination_dir" {
-  type = string
-  default = "/tmp/webapp.env"
-}
+
 
 variable "ec2_ssh_user" {
   type = string
   default = "ubuntu"
 }
 
-# variable "ec2_ssh_key" {
-#   description = "Path to the SSH private key file"
-#   type        = string
-#   default     = null
-# }
+variable "webapp_env_dest_dir" {
+  type = string
+  default = "/tmp/webapp.env"
+}
 
-# locals {
-#   ssh_key_path = var.ec2_ssh_key != null ? var.ec2_ssh_key : "${path.module}/csye6225.pem"
-# }
+variable "cloud_watch_json_local_path" {
+  type = string
+  default = "cloud_watch_agent.json"
+}
 
+
+variable "cloud_watch_json_dest_dir" {
+  type = string
+  default = "/tmp/cloud_watch_agent.json"
+}
+
+
+resource "aws_iam_instance_profile" "cloudwatch_agent_profile" {
+  name = "cloudWatchAgentProfile"
+  role = aws_iam_role.cloudwatch_agent_role.id
+}
 
 resource "aws_instance" "webapp_instance" {
   ami           = var.aws_ami_id  
   instance_type = var.aws_instance_type
   key_name = var.aws_instance_key_name
+
+  iam_instance_profile   = aws_iam_instance_profile.cloudwatch_agent_profile.name
 
   #set user data
   user_data = file(var.ec2_user_data)
@@ -70,31 +76,39 @@ resource "aws_instance" "webapp_instance" {
   #set security group
   vpc_security_group_ids = [aws_security_group.webapp_sg.id]
 
+
+  connection {
+    type        = "ssh"
+    user        = var.ec2_ssh_user
+    private_key = file("${path.module}/csye6225.pem")
+    host        = self.public_ip
+  }
+
   #  将本地的 setup.sh 文件传输到实例的 /opt/ 目录
   provisioner "file" {
     source      = local_file.webapp_env.filename
-    destination = var.destination_dir
+    destination = var.webapp_env_dest_dir
+  }
 
-    connection {
-      type        = "ssh"
-      user        = var.ec2_ssh_user
-      private_key = file("${path.module}/csye6225.pem")
-      host        = self.public_ip
-    }
+  provisioner "file" {
+    source      = var.cloud_watch_json_local_path
+    destination = var.cloud_watch_json_dest_dir
   }
 
   provisioner "remote-exec" {
     inline = [
       "sudo mv -f /tmp/webapp.env /opt/csye6225/webappFlask/app/",
-      "sudo chown csye6225_user:csye6225 /opt/csye6225/webappFlask/app/webapp.env"
+      "sudo chown csye6225_user:csye6225 /opt/csye6225/webappFlask/app/webapp.env",
+      "sudo mv -f /tmp/cloud_watch_agent.json /opt/csye6225/webappFlask/config/cloud_watch_agent.json",
+      "sudo chown csye6225_user:csye6225 /opt/csye6225/webappFlask/config/cloud_watch_agent.json"
     ]
 
-    connection {
-      type        = "ssh"
-      user        = var.ec2_ssh_user
-      private_key = file("${path.module}/csye6225.pem")
-      host        = self.public_ip
-    }
+    # connection {
+    #   type        = "ssh"
+    #   user        = var.ec2_ssh_user
+    #   private_key = file("${path.module}/csye6225.pem")
+    #   host        = self.public_ip
+    # }
   }
 
   root_block_device {
@@ -149,8 +163,17 @@ resource "aws_iam_policy" "webapp_policy" {
   })
 }
 
+
 # Attach policy to webapp
 resource "aws_iam_user_policy_attachment" "webapp_policy_attachment" {
   user       = "webapp"
   policy_arn = aws_iam_policy.webapp_policy.arn
 }
+
+# # Attach policy to webapp
+# resource "aws_iam_user_policy_attachment" "webapp_policy_attachment" {
+#   user       = "webapp"
+#   policy_arn = aws_iam_policy.webapp_policy.arn
+# }
+
+
