@@ -9,3 +9,4 @@ resource "local_file" "webapp_env" {
   })
   filename = "webapp.env"
 }
+
