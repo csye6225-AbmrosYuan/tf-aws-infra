@@ -19,14 +19,11 @@ sudo mkdir -p /var/log/csye6225/webapp_log/
 sudo touch  /var/log/csye6225/webapp_log/flaskapp.log
 sudo chown -R csye6225_user:csye6225 /var/log/csye6225
 
+sudo  touch  /var/A.txt
 
-sudo bash -c "
-    /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
-    -a fetch-config \
-    -m ec2 \
-    -c file:/opt/csye6225/webappFlask/config/cloud_watch_agent.json \
-    -s
-"
+
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/csye6225/webappFlask/config/cloud_watch_agent.json -s
+
 
 sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status
 

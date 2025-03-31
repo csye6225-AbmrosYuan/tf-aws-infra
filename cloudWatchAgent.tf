@@ -20,14 +20,14 @@ data "aws_iam_policy_document" "cloudwatch_agent_policy" {
 
 # 创建 IAM 策略
 resource "aws_iam_policy" "cloudwatch_agent_policy" {
-  name        = "cloudWatchAgentPolicy_new"
+  name        = "cloudWatchAgentPolicy_new_tmp"
   description = "Policy to allow CloudWatch Agent operations"
   policy      = data.aws_iam_policy_document.cloudwatch_agent_policy.json
 }
 
 # 创建 IAM 角色
 resource "aws_iam_role" "cloudwatch_agent_role" {
-  name               = "cloudWatchAgentRole_new"
+  name               = "cloudWatchAgentRole_tmp"
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
 }
 
@@ -46,10 +46,24 @@ data "aws_iam_policy_document" "assume_role_policy" {
 
 # 为 webapp 用户创建并附加策略，允许其假设 cloudWatchAgentRole 角色
 resource "aws_iam_policy" "webapp_assume_role_policy" {
-  name        = "WebappAssumeCloudWatchAgentRolePolicy"
+  name        = "WebappAssumeCloudWatchAgentRolePolicy_tmp"
   description = "Policy to allow webapp user to assume cloudWatchAgentRole"
   policy      = data.aws_iam_policy_document.webapp_assume_role_policy.json
 }
+
+
+resource "aws_iam_role_policy_attachment" "cloudwatch_agent_policy_attachment" {
+  role       = aws_iam_role.cloudwatch_agent_role.name
+  policy_arn = aws_iam_policy.cloudwatch_agent_policy.arn
+}
+
+# 将 AWS 管理的 CloudWatchAgentServerPolicy 策略附加到 cloudWatchAgentRole_new 角色
+resource "aws_iam_role_policy_attachment" "cloudwatch_agent_role_policy_attachment" {
+  role       = aws_iam_role.cloudwatch_agent_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
+
+
 
 data "aws_iam_policy_document" "webapp_assume_role_policy" {
   statement {
@@ -64,3 +78,4 @@ resource "aws_iam_user_policy_attachment" "webapp_assume_role_policy_attachment"
   user       = "webapp"
   policy_arn = aws_iam_policy.webapp_assume_role_policy.arn
 }
+
