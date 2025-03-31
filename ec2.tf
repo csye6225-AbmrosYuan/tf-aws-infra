@@ -58,7 +58,7 @@ variable "cloud_watch_json_dest_dir" {
 
 resource "aws_iam_instance_profile" "cloudwatch_agent_profile" {
   name = "cloudWatchAgentProfile"
-  role = aws_iam_role.cloudwatch_agent_role.id
+  role = aws_iam_role.cloudwatch_agent_role.name
 }
 
 resource "aws_instance" "webapp_instance" {
@@ -100,7 +100,11 @@ resource "aws_instance" "webapp_instance" {
       "sudo mv -f /tmp/webapp.env /opt/csye6225/webappFlask/app/",
       "sudo chown csye6225_user:csye6225 /opt/csye6225/webappFlask/app/webapp.env",
       "sudo mv -f /tmp/cloud_watch_agent.json /opt/csye6225/webappFlask/config/cloud_watch_agent.json",
-      "sudo chown csye6225_user:csye6225 /opt/csye6225/webappFlask/config/cloud_watch_agent.json"
+      "sudo chown csye6225_user:csye6225 /opt/csye6225/webappFlask/config/cloud_watch_agent.json",
+      "sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/csye6225/webappFlask/config/cloud_watch_agent.json -s",
+      "sudo systemctl enable amazon-cloudwatch-agent",
+      "sudo systemctl enable webappFlask",
+      "sudo systemctl start webappFlask.service"
     ]
 
     # connection {
