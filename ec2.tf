@@ -1,7 +1,7 @@
 variable "aws_ami_id" {
   description = "ami id"
   type        = string
-  default     = "ami-097f2882242e0a1c9"
+  default     = "ami-03f3b9b34004ec885"
 }
 
 variable "aws_instance_type" {
@@ -36,6 +36,32 @@ variable "ec2_ssh_user" {
   default = "ubuntu"
 }
 
+# sg for webapp ec2
+resource "aws_security_group" "bastion_sg" {
+  name        = "bastion_sg"
+  description = "Security group for web application instances"
+  vpc_id      = aws_vpc.this.id
+
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "bastion_sg"
+  }
+}
+
 # 创建 Instance Profile，将 ec2_instance_role 与 EC2 实例关联
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
   name = "ec2_instance_profile"
@@ -50,7 +76,7 @@ resource "aws_instance" "webapp_instance" {
 
   user_data              = file(var.ec2_user_data)
   subnet_id              = aws_subnet.public[0].id
-  vpc_security_group_ids = [aws_security_group.webapp_sg.id]
+  vpc_security_group_ids = [aws_security_group.bastion_sg.id]
 
   connection {
     type        = "ssh"
@@ -69,6 +95,6 @@ resource "aws_instance" "webapp_instance" {
   }
 
   tags = {
-    Name = "webapp-instance"
+    Name = "bastion"
   }
 }

@@ -2,13 +2,14 @@
 
 # 从长期存在的配置桶中下载配置文件(awscli 已安装)
 #install aws cli
-sudo mkdir /opt/awscliInstall/
-sudo curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/opt/awscliInstall/awscliv2.zip" && 
-sudo unzip /opt/awscliInstall/awscliv2.zip -d /opt/awscliInstall/ && 
-sudo /opt/awscliInstall/aws/install && 
-sudo aws s3 cp s3://configbucket261447/webapp.env /opt/csye6225/webappFlask/app/webapp.env && 
+# sudo mkdir /opt/awscliInstall/
+# sudo curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/opt/awscliInstall/awscliv2.zip" && 
+# sudo unzip /opt/awscliInstall/awscliv2.zip -d /opt/awscliInstall/ && 
+# sudo /opt/awscliInstall/aws/install && 
+touch /opt/C.txt
+sudo aws s3 cp s3://configbucket261447/webapp.env /opt/csye6225/webappFlask/app/webapp.env 
 sudo aws s3 cp s3://configbucket261447/cloud_watch_agent.json /opt/csye6225/webappFlask/config/cloud_watch_agent.json && 
-touch /opt/B.txt
+
 # /usr/local/bin/aws --version
 
 # 将 .env 文件移动到应用目录，并设置权限

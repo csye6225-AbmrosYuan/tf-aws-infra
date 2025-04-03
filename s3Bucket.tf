@@ -34,3 +34,13 @@ resource "aws_s3_bucket_lifecycle_configuration" "webappbucket_lifecycle" {
     }
   }
 }
+
+
+#add S3 vpc endpoint for ec2 in private subnets
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id       = aws_vpc.this.id
+  service_name = "com.amazonaws.${var.aws_region}.s3"
+  route_table_ids = [
+    aws_route_table.private.id
+  ]
+}
