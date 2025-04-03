@@ -75,6 +75,20 @@ resource "aws_iam_policy" "webapp_policy" {
         ],
         Resource = "${aws_s3_bucket.webappbucket.arn}/*"
       },
+
+      {
+        Sid    = "ConfigBucketAccess",
+        Effect = "Allow",
+        Action = [
+          "s3:GetObject",
+          "s3:ListBucket"
+        ],
+        Resource = [
+          "arn:aws:s3:::configbucket261447",
+          "arn:aws:s3:::configbucket261447/*"
+        ]
+      },
+      
       {
         Sid    = "EC2Operations",
         Effect = "Allow",
