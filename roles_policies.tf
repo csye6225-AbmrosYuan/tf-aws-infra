@@ -102,7 +102,7 @@ resource "aws_iam_policy" "webapp_policy" {
           "rds:DescribeDBSnapshots",
           "rds:DescribeDBLogFiles"
         ],
-        Resource = "*"
+        Resource = "${aws_db_instance.rds_instance.arn}"
       }
     ]
   })
