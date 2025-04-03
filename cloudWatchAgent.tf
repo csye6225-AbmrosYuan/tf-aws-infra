@@ -1,3 +1,5 @@
+
+#创建CloudWatchAgent Policy
 data "aws_iam_policy_document" "cloudwatch_agent_policy" {
   statement {
     actions = [
@@ -18,20 +20,14 @@ data "aws_iam_policy_document" "cloudwatch_agent_policy" {
   }
 }
 
-# 创建 IAM 策略
 resource "aws_iam_policy" "cloudwatch_agent_policy" {
   name        = "cloudWatchAgentPolicy_new_tmp"
   description = "Policy to allow CloudWatch Agent operations"
   policy      = data.aws_iam_policy_document.cloudwatch_agent_policy.json
 }
 
-# 创建 IAM 角色
-resource "aws_iam_role" "cloudwatch_agent_role" {
-  name               = "cloudWatchAgentRole_tmp"
-  assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
-}
 
-# 定义角色的信任策略
+# 允许ec2 代入角色
 data "aws_iam_policy_document" "assume_role_policy" {
   statement {
     actions   = ["sts:AssumeRole"]
@@ -43,39 +39,77 @@ data "aws_iam_policy_document" "assume_role_policy" {
   }
 }
 
-
-# 为 webapp 用户创建并附加策略，允许其假设 cloudWatchAgentRole 角色
-resource "aws_iam_policy" "webapp_assume_role_policy" {
-  name        = "WebappAssumeCloudWatchAgentRolePolicy_tmp"
-  description = "Policy to allow webapp user to assume cloudWatchAgentRole"
-  policy      = data.aws_iam_policy_document.webapp_assume_role_policy.json
+# 创建 ec2_instance_role，角色会在 AWS Console 中显示
+resource "aws_iam_role" "ec2_instance_role" {
+  name               = "ec2_instance_role"
+  assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
 }
 
-
+# 附加 CloudWatch Agent 自定义权限
 resource "aws_iam_role_policy_attachment" "cloudwatch_agent_policy_attachment" {
-  role       = aws_iam_role.cloudwatch_agent_role.name
+  role       = aws_iam_role.ec2_instance_role.name
   policy_arn = aws_iam_policy.cloudwatch_agent_policy.arn
 }
 
-# 将 AWS 管理的 CloudWatchAgentServerPolicy 策略附加到 cloudWatchAgentRole_new 角色
+# 附加 AWS 管理的 CloudWatchAgentServerPolicy
 resource "aws_iam_role_policy_attachment" "cloudwatch_agent_role_policy_attachment" {
-  role       = aws_iam_role.cloudwatch_agent_role.name
+  role       = aws_iam_role.ec2_instance_role.name
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
-
-
-data "aws_iam_policy_document" "webapp_assume_role_policy" {
-  statement {
-    actions = ["sts:AssumeRole"]
-    effect  = "Allow"
-    resources = [aws_iam_role.cloudwatch_agent_role.arn]
-  }
+# 附加 webapp 权限（包括 S3、EC2、RDS 访问权限）
+resource "aws_iam_policy" "webapp_policy" {
+  name        = "webapp_policy"
+  description = "Policy for EC2 instance role with S3, EC2, and RDS permissions"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "ObjectOperations",
+        Effect = "Allow",
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucket"
+        ],
+        Resource = "${aws_s3_bucket.webappbucket.arn}/*"
+      },
+      {
+        Sid    = "EC2Operations",
+        Effect = "Allow",
+        Action = [
+          "ec2:AssociateRouteTable",
+          "ec2:AuthorizeSecurityGroupEgress",
+          "ec2:CreateRouteTable",
+          "ec2:CreateSecurityGroup",
+          "ec2:CreateSubnet",
+          "ec2:DescribeInstances",
+          "ec2:DescribeNetworkInterfaces",
+          "ec2:DescribeRouteTables",
+          "ec2:DescribeSecurityGroups",
+          "ec2:DescribeSubnets",
+          "ec2:ModifyNetworkInterfaceAttribute",
+          "ec2:RevokeSecurityGroupEgress"
+        ],
+        Resource = "*"
+      },
+      {
+        Sid    = "RDSAccess",
+        Effect = "Allow",
+        Action = [
+          "rds:DescribeDBInstances",
+          "rds:DescribeDBSnapshots",
+          "rds:DescribeDBLogFiles"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
 }
 
-
-resource "aws_iam_user_policy_attachment" "webapp_assume_role_policy_attachment" {
-  user       = "webapp"
-  policy_arn = aws_iam_policy.webapp_assume_role_policy.arn
+# 附加 webapp_policy
+resource "aws_iam_role_policy_attachment" "webapp_policy_attachment" {
+  role       = aws_iam_role.ec2_instance_role.name
+  policy_arn = aws_iam_policy.webapp_policy.arn
 }
-
