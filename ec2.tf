@@ -36,21 +36,6 @@ variable "ec2_ssh_user" {
   default = "ubuntu"
 }
 
-variable "webapp_env_dest_dir" {
-  type    = string
-  default = "/tmp/webapp.env"
-}
-
-variable "cloud_watch_json_local_path" {
-  type    = string
-  default = "cloud_watch_agent.json"
-}
-
-variable "cloud_watch_json_dest_dir" {
-  type    = string
-  default = "/tmp/cloud_watch_agent.json"
-}
-
 # 创建 Instance Profile，将 ec2_instance_role 与 EC2 实例关联
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
   name = "ec2_instance_profile"
@@ -74,28 +59,8 @@ resource "aws_instance" "webapp_instance" {
     host        = self.public_ip
   }
 
-  provisioner "file" {
-    source      = local_file.webapp_env.filename
-    destination = var.webapp_env_dest_dir
-  }
-
-  provisioner "file" {
-    source      = var.cloud_watch_json_local_path
-    destination = var.cloud_watch_json_dest_dir
-  }
-
-  # provisioner "remote-exec" {
-  #   inline = [
-  #     "sudo mv -f /tmp/webapp.env /opt/csye6225/webappFlask/app/",
-  #     "sudo chown csye6225_user:csye6225 /opt/csye6225/webappFlask/app/webapp.env",
-  #     "sudo mv -f /tmp/cloud_watch_agent.json /opt/csye6225/webappFlask/config/cloud_watch_agent.json",
-  #     "sudo chown csye6225_user:csye6225 /opt/csye6225/webappFlask/config/cloud_watch_agent.json",
-  #     "sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/csye6225/webappFlask/config/cloud_watch_agent.json -s",
-  #     "sudo systemctl enable amazon-cloudwatch-agent",
-  #     "sudo systemctl enable webappFlask",
-  #     "sudo systemctl start webappFlask.service"
-  #   ]
-  # }
+  # 移除原来通过 provisioner 传递文件的部分：
+  # provisioner "file" { ... }
 
   root_block_device {
     volume_size           = var.aws_volume_size  
