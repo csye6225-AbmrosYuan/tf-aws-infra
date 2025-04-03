@@ -1,5 +1,3 @@
-
-
 resource "local_file" "webapp_env" {
   content = templatefile("${path.module}/webapp.env.tpl", {
     db_host        = split(":",  aws_db_instance.rds_instance.endpoint)[0]
@@ -9,4 +7,3 @@ resource "local_file" "webapp_env" {
   })
   filename = "webapp.env"
 }
-

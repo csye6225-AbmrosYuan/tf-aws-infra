@@ -78,24 +78,16 @@ resource "aws_db_subnet_group" "rds_subnet_group" {
 resource "aws_db_instance" "rds_instance" {
   identifier             = var.db_identifier
   engine                 = var.db_engine
-
   instance_class         = var.instance_class
   allocated_storage      = var.allocated_storage
-
   publicly_accessible    = var.publicly_accessible
   multi_az               = var.multi_az
   skip_final_snapshot    = var.skip_final_snapshot
-
   db_subnet_group_name   = aws_db_subnet_group.rds_subnet_group.name
   vpc_security_group_ids = [aws_security_group.db_sg.id]
   parameter_group_name   = aws_db_parameter_group.mysql_pg.name
-  
   username               = var.db_username
   password               = var.db_password
   db_name                = var.db_name
-  
-  tags = var.tags
+  tags                   = var.tags
 }
-
-
-
