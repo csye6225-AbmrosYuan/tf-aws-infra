@@ -1,13 +1,20 @@
 # 获取根域名的 Route 53 Hosted Zone
+variable "a_record_name" {
+  description = "A record name"
+  type        = string
+  # default     = "dev.abmroseuan.me"
+  default     = "demo.abmroseuan.me"
+}
+
 data "aws_route53_zone" "root_zone" {
-  name         = "dev.abmroseuan.me"
+  name         = var.a_record_name
   private_zone = false
 }
 
 # 创建指向 ALB 的 A 记录
 resource "aws_route53_record" "dev_abmroseuan_me" {
   zone_id = data.aws_route53_zone.root_zone.zone_id
-  name    = "dev.abmroseuan.me"
+  name    = var.a_record_name
   type    = "A"
 
   alias {

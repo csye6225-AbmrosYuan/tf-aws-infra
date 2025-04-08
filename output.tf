@@ -1,7 +1,9 @@
 variable "config_bucket" {
   description = "The name of the long-term config bucket."
   type        = string
-  default     = "configbucket261447"
+  # default     = "configbucket261447"
+  default     = "configbucket261447demo"
+
 }
 
 variable "config_env_key" {

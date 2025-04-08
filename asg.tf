@@ -6,7 +6,7 @@ resource "aws_launch_template" "webapp_lt" {
   key_name      = var.aws_instance_key_name
 
   network_interfaces {
-    associate_public_ip_address = true
+    associate_public_ip_address = false
     security_groups             = [aws_security_group.webapp_sg.id]
   }
 

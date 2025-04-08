@@ -7,8 +7,11 @@
 # sudo unzip /opt/awscliInstall/awscliv2.zip -d /opt/awscliInstall/ && 
 # sudo /opt/awscliInstall/aws/install && 
 touch /opt/C.txt
-sudo aws s3 cp s3://configbucket261447/webapp.env /opt/csye6225/webappFlask/app/webapp.env 
-sudo aws s3 cp s3://configbucket261447/cloud_watch_agent.json /opt/csye6225/webappFlask/config/cloud_watch_agent.json && 
+# sudo aws s3 cp s3://configbucket261447/webapp.env /opt/csye6225/webappFlask/app/webapp.env 
+# sudo aws s3 cp s3://configbucket261447/cloud_watch_agent.json /opt/csye6225/webappFlask/config/cloud_watch_agent.json && 
+
+sudo aws s3 cp s3://configbucket261447demo/webapp.env /opt/csye6225/webappFlask/app/webapp.env 
+sudo aws s3 cp s3://configbucket261447demo/cloud_watch_agent.json /opt/csye6225/webappFlask/config/cloud_watch_agent.json && 
 
 # /usr/local/bin/aws --version
 
