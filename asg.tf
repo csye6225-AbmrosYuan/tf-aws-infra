@@ -52,7 +52,7 @@ resource "aws_autoscaling_group" "webapp_asg" {
 
   tag {
     key                 = "Name"
-    value               = "webapp-instance"
+    value               = "asg-webapp-instance"
     propagate_at_launch = true
   }
 }
