@@ -84,8 +84,11 @@ resource "aws_iam_policy" "webapp_policy" {
           "s3:ListBucket"
         ],
         Resource = [
-          "arn:aws:s3:::configbucket261447",
-          "arn:aws:s3:::configbucket261447/*"
+          # "arn:aws:s3:::configbucket261447",
+          # "arn:aws:s3:::configbucket261447/*"
+
+          "arn:aws:s3:::configbucket261447demo",
+          "arn:aws:s3:::configbucket261447demo/*"
         ]
       },
       

@@ -13,7 +13,9 @@ variable "aws_instance_type" {
 variable "aws_instance_key_name" {
   description = "ssh key"
   type        = string
-  default     = "csye6225"
+  # default     = "csye6225"
+  default     = "csye6225demo"
+
 }
 
 variable "aws_volume_size" {
@@ -75,13 +77,15 @@ resource "aws_instance" "webapp_instance" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
 
   user_data              = file(var.ec2_user_data)
+  # subnet_id              = aws_subnet.public[0].id
   subnet_id              = aws_subnet.public[0].id
   vpc_security_group_ids = [aws_security_group.bastion_sg.id]
 
   connection {
     type        = "ssh"
     user        = var.ec2_ssh_user
-    private_key = file("${path.module}/csye6225.pem")
+    # private_key = file("${path.module}/csye6225.pem")
+    private_key = file("${path.module}/csye6225demo.pem")
     host        = self.public_ip
   }
 

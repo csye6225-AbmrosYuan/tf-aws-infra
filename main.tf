@@ -19,7 +19,8 @@ data "aws_availability_zones" "available" {
 variable "profile" {
   description = "AWS CLI profile to use."
   type        = string
-  default     = "terraform"
+  # default     = "terraform"
+  default     = ""
 }
 
 variable "aws_region" {
