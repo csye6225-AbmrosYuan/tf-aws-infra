@@ -107,7 +107,12 @@ resource "aws_iam_policy" "webapp_policy" {
           "ec2:DescribeSecurityGroups",
           "ec2:DescribeSubnets",
           "ec2:ModifyNetworkInterfaceAttribute",
-          "ec2:RevokeSecurityGroupEgress"
+          "ec2:RevokeSecurityGroupEgress",
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
         ],
         Resource = "*"
       },
