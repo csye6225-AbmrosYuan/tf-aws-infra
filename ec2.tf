@@ -1,6 +1,7 @@
 variable "aws_ami_id" {
   description = "ami id"
   type        = string
+  # default     = "ami-08842739f1865373e"
   default     = "ami-03f3b9b34004ec885"
 }
 

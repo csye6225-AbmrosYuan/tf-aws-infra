@@ -28,11 +28,11 @@ variable "db_username" {
   default     = "root"
 }
 
-variable "db_password" {
-  description = "The master password for the database"
-  type        = string
-  default     = "12345678"
-}
+# variable "db_password" {
+#   description = "The master password for the database"
+#   type        = string
+#   default     = "12345678"
+# }
 
 variable "db_name" {
   description = "The name of the database to create"
@@ -87,7 +87,12 @@ resource "aws_db_instance" "rds_instance" {
   vpc_security_group_ids = [aws_security_group.db_sg.id]
   parameter_group_name   = aws_db_parameter_group.mysql_pg.name
   username               = var.db_username
-  password               = var.db_password
+  # password               = var.db_password
+  password               = random_password.db_password.result
+
+  storage_encrypted      = true
+  kms_key_id             = data.aws_kms_key.rds_key.arn
+
   db_name                = var.db_name
   tags                   = var.tags
 }

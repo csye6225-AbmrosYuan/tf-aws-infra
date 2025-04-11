@@ -10,7 +10,43 @@ resource "aws_launch_template" "webapp_lt" {
     security_groups             = [aws_security_group.webapp_sg.id]
   }
 
-  user_data = filebase64(var.ec2_user_data)
+  # user_data = filebase64(var.ec2_user_data)
+  user_data = base64encode(<<-EOT
+    #!/bin/bash
+    touch /opt/C.txt
+    sudo aws s3 cp s3://configbucket261447demo/cloud_watch_agent.json /opt/csye6225/webappFlask/config/cloud_watch_agent.json
+
+    sudo cat <<EOF > /opt/csye6225/webappFlask/app/webapp.env
+    MYSQL_USERNAME=${var.db_username}
+    MYSQL_PASSWORD=${random_password.db_password.result}
+
+    WEBAPP_SECRET_KEY=${jsondecode(data.aws_secretsmanager_secret_version.webapp_credentials_version.secret_string)["WEBAPP_SECRET_KEY"]}
+    WEBAPP_AES_SECRET_KEY=${jsondecode(data.aws_secretsmanager_secret_version.webapp_credentials_version.secret_string)["WEBAPP_AES_SECRET_KEY"]}
+    WEBAPP_PUBLIC_KEY=${jsondecode(data.aws_secretsmanager_secret_version.webapp_credentials_version.secret_string)["WEBAPP_PUBLIC_KEY"]}
+    WEBAPP_PRIVATE_KEY=${jsondecode(data.aws_secretsmanager_secret_version.webapp_credentials_version.secret_string)["WEBAPP_PRIVATE_KEY"]}
+
+    DB_HOST=${split(":", aws_db_instance.rds_instance.endpoint)[0]}
+
+    AWS_S3_REGION_NAME=${var.aws_region}
+    AWS_S3_BUCKET_NAME=${aws_s3_bucket.webappbucket.bucket}
+    EOF
+
+    sudo chown csye6225_user:csye6225 /opt/csye6225/webappFlask/app/webapp.env 
+    sudo chown csye6225_user:csye6225 /opt/csye6225/webappFlask/config/cloud_watch_agent.json
+
+    sudo mkdir -p /var/log/csye6225/webapp_log/
+    sudo touch /var/log/csye6225/webapp_log/flaskapp.log
+    sudo chown -R csye6225_user:csye6225 /var/log/csye6225
+
+    sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/csye6225/webappFlask/config/cloud_watch_agent.json -s
+    sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status
+
+    sudo systemctl enable amazon-cloudwatch-agent
+
+    sudo systemctl enable webappFlask
+    sudo systemctl start webappFlask.service
+  EOT
+  )
   
 
   iam_instance_profile {
@@ -21,6 +57,17 @@ resource "aws_launch_template" "webapp_lt" {
     resource_type = "instance"
     tags = {
       Name = "webapp-instance-byASG"
+    }
+  }
+
+  block_device_mappings {
+    device_name = "/dev/sda1"
+    ebs {
+      volume_size           = 8
+      volume_type           = "gp2"
+      delete_on_termination = true
+      encrypted            = true
+      kms_key_id           = data.aws_kms_key.ec2_key.arn
     }
   }
 }
