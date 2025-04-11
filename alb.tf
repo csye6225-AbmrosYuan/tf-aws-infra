@@ -108,3 +108,34 @@ resource "aws_lb_listener" "http" {
     target_group_arn = aws_lb_target_group.webapp_tg.arn
   }
 }
+
+resource "aws_lb_listener" "https" {
+  load_balancer_arn = aws_lb.webapp_alb.arn
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  # certificate_arn  = data.aws_acm_certificate.abmroseuan_cert.arn
+  certificate_arn   = "arn:aws:acm:us-east-1:980921725983:certificate/b2eebe6d-4f09-47f4-8ec7-3edbe9bc757d"
+
+
+  default_action {
+    type = "fixed-response"
+    fixed_response {
+      content_type  = "text/plain"  # 设置响应内容类型
+      message_body  = "OK"
+      status_code   = 200
+    }
+  }
+}
+
+# variable "domain_name" {
+#   type = string
+#   default = "abmroseuan.me"
+# }
+
+# data "aws_acm_certificate" "abmroseuan_cert" {
+#   provider = aws.acm
+#   domain   = var.domain_name 
+#   statuses = ["ISSUED"]
+#   most_recent = true
+# }
